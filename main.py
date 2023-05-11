@@ -18,8 +18,8 @@ a = time.time()
 waitingForWheelChange = False
 
 
-while distSensor.distance() < 300:
-    controls.runRaceV2()
+while True:
+    controls.runRaceV3()
     # if int(time.time() - a) == 15:
     #     waitingForWheelChange = True
     # if waitingForWheelChange and (-20 < controls.averageAngle() < 20):

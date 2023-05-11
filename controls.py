@@ -23,11 +23,11 @@ class Controls():
         self.RSensorCalib = 25
         self.starttime = time.time()
         self.angle = 0
-        self.speed = 1000
+        self.speed = 2000
         self.memory = [0]
 
     # Activate back motors
-    def move(self, speed) -> None:
+    def move(self, speed: int) -> None:
         self.LMotor.run(speed)
         self.RMotor.run(speed)
 
@@ -36,16 +36,12 @@ class Controls():
             self.LMotor.run(speed / (1 + self.angle/100))
         if self.angle < 0:
             self.RMotor.run(speed / (1 - self.angle/100))
+    
+    def moveStraight(self, speed: int):
+        self.LMotor.run(speed)
+        self.RMotor.run(speed)
 
     # Angle logic
-    def increment_angle(self, inc: float):
-        self.angle += inc
-        if self.angle > 90:
-            self.angle = 90
-        elif self.angle < -90:
-            self.angle = -90
-        self.set_angle(self.angle)
-
     def set_angle(self, angle: float):
         if angle > 200: self.angle = 200
         elif angle < -200: self.angle = -200
@@ -108,6 +104,12 @@ class Controls():
                 self.set_angle(-turnMult * (self.RSensorCalib - self.RSensor.reflection()))
             elif self.RSensor.reflection() > self.RSensorCalib and self.LSensor.reflection() > self.LSensorCalib:
                 self.set_angle(10 * self.memory[-1])
+    
+    def runRaceV3(self) -> None:
+        if -20 < self.averageAngle() < 20:
+            self.runRace()
+        else:
+           self.runRaceV2()
     
     def debug(self) -> list:
         return [self.LSensor.reflection(), self.MSensor.reflection(), self.RSensor.reflection()]
