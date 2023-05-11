@@ -12,7 +12,16 @@ import time
 # Create your objects here.
 
 controls = Controls(EV3Brick(), Motor(Port.D), Motor(Port.A), Motor(Port.C), ColorSensor(Port.S3), ColorSensor(Port.S2), ColorSensor(Port.S1))
+distSensor = UltrasonicSensor(Port.S4)
 
-while True:
-    controls.runRace()
-    
+a = time.time()
+waitingForWheelChange = False
+
+
+while distSensor.distance() < 300:
+    controls.runRaceV2()
+    # if int(time.time() - a) == 15:
+    #     waitingForWheelChange = True
+    # if waitingForWheelChange and (-20 < controls.averageAngle() < 20):
+    #     controls.changeWheels(100)
+    #     waitingForWheelChange = False
