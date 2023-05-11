@@ -19,7 +19,7 @@ class Controls():
         self.MSensor = MSensor
         self.RSensor = RSensor
         self.angle = 0
-        self.speed = 720
+        self.speed = 700
         self.runtime = 0
         self.memory = [0]
 
@@ -47,17 +47,18 @@ class Controls():
         if angle > 200: self.angle = 200
         elif angle < -200: self.angle = -200
         else: self.angle = angle
-        if len(self.memory) == 200:
+        if len(self.memory) == 50:
+            print(len(self.memory))
             self.memory.pop(0)
         self.memory.append(self.angle)
 
-    def isTurning(self) -> list[bool, int]:
+    def averageAngle(self) -> int:
         # Not working
         averageAngle = 0
         for i in self.memory:
             averageAngle += i
         averageAngle /= len(self.memory)
-        print(averageAngle)
+        return averageAngle
 
     # Main loop
     def runRace(self) -> None:
@@ -68,7 +69,12 @@ class Controls():
         if self.MSensor.reflection() < 25:
             self.set_angle(1.7 * (25 - self.LSensor.reflection()))
         else:
-            self.set_angle(5 * (25 - self.LSensor.reflection()))
+            if self.RSensor.reflection() < 25:
+                self.set_angle(5 * (25 - self.LSensor.reflection()))
+            elif self.LSensor.reflection() < 25:
+                self.set_angle(-5 * (25 - self.RSensor.reflection()))
+            elif self.RSensor.reflection() > 25 and self.LSensor.reflection() > 25:
+                self.set_angle(10 * self.averageAngle())
     
     def debug(self) -> list:
         return [self.LSensor.reflection(), self.MSensor.reflection(), self.RSensor.reflection()]
