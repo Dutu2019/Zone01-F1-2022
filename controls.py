@@ -19,7 +19,7 @@ class Controls():
         self.MSensor = MSensor
         self.RSensor = RSensor
         self.angle = 0
-        self.speed = 700
+        self.speed = 730
         self.runtime = 0
         self.memory = [0]
 
@@ -48,7 +48,6 @@ class Controls():
         elif angle < -200: self.angle = -200
         else: self.angle = angle
         if len(self.memory) == 50:
-            print(len(self.memory))
             self.memory.pop(0)
         self.memory.append(self.angle)
 
@@ -67,12 +66,12 @@ class Controls():
 
         # Not turning counterclockwise
         if self.MSensor.reflection() < 25:
-            self.set_angle(1.7 * (25 - self.LSensor.reflection()))
+            self.set_angle(1.7 * (30 - self.LSensor.reflection()))
         else:
             if self.RSensor.reflection() < 25:
-                self.set_angle(5 * (25 - self.LSensor.reflection()))
+                self.set_angle(4.5 * (30 - self.LSensor.reflection()))
             elif self.LSensor.reflection() < 25:
-                self.set_angle(-5 * (25 - self.RSensor.reflection()))
+                self.set_angle(-4.5 * (25 - self.RSensor.reflection()))
             elif self.RSensor.reflection() > 25 and self.LSensor.reflection() > 25:
                 self.set_angle(10 * self.averageAngle())
     
