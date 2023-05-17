@@ -11,8 +11,7 @@ import time
 
 # Create your objects here.
 
-controls = Controls(EV3Brick(), Motor(Port.D), Motor(Port.A), Motor(Port.C), ColorSensor(Port.S3), ColorSensor(Port.S2), ColorSensor(Port.S1), UltrasonicSensor(Port.S4))
-distSensor = UltrasonicSensor(Port.S4)
+controls = Controls(EV3Brick(), Motor(Port.A), Motor(Port.D), Motor(Port.C), ColorSensor(Port.S1), ColorSensor(Port.S2), ColorSensor(Port.S3))
 
 a = time.time()
 waitingForWheelChange = False
