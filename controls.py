@@ -19,28 +19,28 @@ class Controls():
         self.MSensor = MSensor
         self.RSensor = RSensor
         # self.USensor = USensor
-        self.LSensorCalib = 30
-        self.MSensorCalib = 30
+        self.LSensorCalib = 25
+        self.MSensorCalib = 25
         self.RSensorCalib = 25
         self.angle = 0
-        self.maxAngle = 160
-        self.maxSpeed = 900
+        self.maxAngle = 100
+        self.maxSpeed = 1000
         self.speed = 900
         self.memory = [0]
-        self.memoryLength = 15
+        self.memoryLength = 1
         self.starttime = time.time()
 
     # Activate back motors
     def move(self) -> None:
-        self.set_speed(self.maxSpeed - 0.1 * ((self.maxSpeed/self.maxAngle) * abs(self.averageAngle())))
+        self.set_speed(self.maxSpeed - 0.4 * ((self.maxSpeed/self.maxAngle) * abs(self.averageAngle())))
         self.LMotor.run(self.speed)
         self.RMotor.run(self.speed)
 
         # Proportionnal steering
         if self.angle > 0:
-            self.LMotor.run(self.speed / (1 + self.angle/50))
+            self.LMotor.run(self.speed / (1 + self.angle/30))
         if self.angle < 0:
-            self.RMotor.run(self.speed / (1 - self.angle/50))
+            self.RMotor.run(self.speed / (1 - self.angle/30))
     
     # def checkDist(self) -> None:
     #     self.speed = max(0, 2 * (self.USensor.distance() - 200))
@@ -87,7 +87,7 @@ class Controls():
         self.trackAngle()
 
         if self.MSensor.reflection() < self.MSensorCalib:
-            self.set_angle(1 * (self.LSensorCalib - self.LSensor.reflection()))
+            self.set_angle(0.5 * (self.LSensorCalib - self.LSensor.reflection()))
         else:
             if self.RSensor.reflection() < self.RSensorCalib:
                 self.set_angle(turnMult * (self.LSensorCalib - self.LSensor.reflection()))
@@ -98,7 +98,7 @@ class Controls():
     
     def runRaceV2(self) -> None:
         # Creates a multiplier in function of the average of the last angles
-        turnMult = abs(self.averageAngle()) / 70 + 1
+        turnMult = abs(self.averageAngle()) / 250 + 1
         self.runRace(turnMult)
     
     def runRaceV3(self) -> None:
