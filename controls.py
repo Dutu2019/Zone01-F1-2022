@@ -7,8 +7,9 @@ import time
 
 class Controls():
 
-    def __init__(self, Brick: EV3Brick, LMotor: Motor, RMotor: Motor, MMotor: Motor, LSensor: ColorSensor, MSensor: ColorSensor, RSensor: ColorSensor) -> None:
+    def __init__(self, Brick: EV3Brick, LMotor: Motor, RMotor: Motor, MMotor: Motor, LSensor: ColorSensor, MSensor: ColorSensor, RSensor: ColorSensor, maxSpeed=1000) -> None:
         self.Brick = Brick
+        self.Brick.screen.clear()
         self.LMotor = LMotor
         self.RMotor = RMotor
         self.MMotor = MMotor
@@ -20,27 +21,27 @@ class Controls():
         self.RSensor = RSensor
         # self.USensor = USensor
         self.LSensorCalib = 25
-        self.MSensorCalib = 25
-        self.RSensorCalib = 25
+        self.MSensorCalib = 30
+        self.RSensorCalib = 30
         self.angle = 0
         self.maxAngle = 100
-        self.maxSpeed = 1000
-        self.speed = 900
+        self.maxSpeed = maxSpeed
+        self.speed = self.maxSpeed/2
         self.memory = [0]
         self.memoryLength = 1
         self.starttime = time.time()
 
     # Activate back motors
     def move(self) -> None:
-        self.set_speed(self.maxSpeed - 0.4 * ((self.maxSpeed/self.maxAngle) * abs(self.averageAngle())))
+        self.set_speed(self.maxSpeed - 0.3 * ((self.maxSpeed/self.maxAngle) * abs(self.angle)))
         self.LMotor.run(self.speed)
         self.RMotor.run(self.speed)
 
         # Proportionnal steering
         if self.angle > 0:
-            self.LMotor.run(self.speed / (1 + self.angle/30))
+            self.LMotor.run(self.speed / (1 + self.angle/35))
         if self.angle < 0:
-            self.RMotor.run(self.speed / (1 - self.angle/30))
+            self.RMotor.run(self.speed / (1 - self.angle/35))
     
     # def checkDist(self) -> None:
     #     self.speed = max(0, 2 * (self.USensor.distance() - 200))
@@ -83,7 +84,7 @@ class Controls():
 
     # Main loops
     def runRace(self, turnMult = 4.8) -> None:
-        print(self.averageAngle())
+        print(self.debug())
         self.trackAngle()
 
         if self.MSensor.reflection() < self.MSensorCalib:
@@ -94,18 +95,12 @@ class Controls():
             elif self.LSensor.reflection() < self.LSensorCalib:
                 self.set_angle(-turnMult * (self.RSensorCalib - self.RSensor.reflection()))
             elif self.RSensor.reflection() > self.RSensorCalib and self.LSensor.reflection() > self.LSensorCalib:
-                self.set_angle(100 * self.memory[-1])
+                self.set_angle(100 * self.angle)
     
     def runRaceV2(self) -> None:
         # Creates a multiplier in function of the average of the last angles
-        turnMult = abs(self.averageAngle()) / 250 + 1
+        turnMult = abs(self.angle) / 150 + 1
         self.runRace(turnMult)
     
-    def runRaceV3(self) -> None:
-        if -20 < self.averageAngle() < 20:
-            self.runRace()
-        else:
-           self.runRaceV2()
-    
-    def debug(self) -> list:
-        return self.averageAngle()
+    def debug(self) -> float:
+        return self.speed
