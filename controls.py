@@ -20,20 +20,17 @@ class Controls():
         self.MSensor = MSensor
         self.RSensor = RSensor
         # self.USensor = USensor
-        self.LSensorCalib = 25
-        self.MSensorCalib = 30
-        self.RSensorCalib = 30
+        self.LSensorCalib = 30
+        self.MSensorCalib = 35
+        self.RSensorCalib = 35
         self.angle = 0
-        self.maxAngle = 100
+        self.maxAngle = 80
         self.maxSpeed = maxSpeed
         self.speed = self.maxSpeed/2
-        self.memory = [0]
-        self.memoryLength = 1
         self.starttime = time.time()
 
     # Activate back motors
     def move(self) -> None:
-        self.set_speed(self.maxSpeed - 0.3 * ((self.maxSpeed/self.maxAngle) * abs(self.angle)))
         self.LMotor.run(self.speed)
         self.RMotor.run(self.speed)
 
@@ -47,36 +44,26 @@ class Controls():
     #     self.speed = max(0, 2 * (self.USensor.distance() - 200))
 
     # Angle logic
-    def trackAngle(self) -> None:
-        self.MMotor.track_target(self.angle)
-        if len(self.memory) == self.memoryLength:
-            self.memory.pop(0)
-        self.memory.append(self.angle)
-        self.move()
-
-    def averageAngle(self) -> int:
-        averageAngle = 0
-        for i in self.memory:
-            averageAngle += i
-        averageAngle /= len(self.memory)
-        return averageAngle
-
     def changeWheels(self, angle: int) -> None:
         a = time.time()
-        self.move(self.speed/2)
-        while time.time() - a < 2:
+        self.move()
+        while time.time() - a < 0.5:
             self.set_angle(angle)
-        while time.time() - a < 4:
+        while time.time() - a < 1:
             self.set_angle(-angle)
-        while time.time() - a < 14:
+        while time.time() - a < 11:
             self.set_angle(0)
-            self.move(0)
+            self.set_speed(0)
+            self.move()
     
     # Setter functions
     def set_angle(self, angle: float) -> None:
         if angle > self.maxAngle: self.angle = self.maxAngle
         elif angle < -self.maxAngle: self.angle = -self.maxAngle
         else: self.angle = angle
+        self.MMotor.track_target(self.angle)
+        self.set_speed(self.maxSpeed - 0.3 * ((self.maxSpeed/self.maxAngle) * abs(self.angle)))
+        self.move()
 
     def set_speed(self, speed: float) -> None:
         if speed > self.maxSpeed: self.speed = self.maxSpeed
@@ -84,8 +71,6 @@ class Controls():
 
     # Main loops
     def runRace(self, turnMult = 4.8) -> None:
-        print(self.debug())
-        self.trackAngle()
 
         if self.MSensor.reflection() < self.MSensorCalib:
             self.set_angle(0.5 * (self.LSensorCalib - self.LSensor.reflection()))
@@ -99,7 +84,7 @@ class Controls():
     
     def runRaceV2(self) -> None:
         # Creates a multiplier in function of the average of the last angles
-        turnMult = abs(self.angle) / 150 + 1
+        turnMult = abs(self.angle) / 135 + 1
         self.runRace(turnMult)
     
     def debug(self) -> float:
