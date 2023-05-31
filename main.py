@@ -16,12 +16,12 @@ waitingForWheelChange = False
 brick.screen.print("Select race version:")
 controls = Controls(brick, Motor(Port.A), Motor(Port.D), Motor(Port.C), ColorSensor(Port.S1), ColorSensor(Port.S2), ColorSensor(Port.S3), UltrasonicSensor(Port.S4))
 while True:
-    controls.runRaceV2()
+    controls.main()
 
-    # if int(time.time() - a) == 5:
-    #     waitingForWheelChange = True
-    # if waitingForWheelChange and (-20 < controls.angle < 20):
-    #     controls.changeWheels(100)
-    #     while not Button.UP in brick.buttons.pressed():
-    #         pass
-    #     waitingForWheelChange = False
+    if int(time.time() - a) == 5:
+        waitingForWheelChange = True
+    if waitingForWheelChange and (-20 < controls.angle < 20):
+        controls.changeWheels(100)
+        while not Button.UP in brick.buttons.pressed():
+            pass
+        waitingForWheelChange = False
